@@ -42,17 +42,19 @@ resource "aws_route53_record" "skippymart_cert_validation" {
 
   zone_id = data.aws_route53_zone.domain_zone.id
   name    = each.value.name
-  # name    = "www.${data.aws_route53_zone.domain_zone.name}"
   type    = each.value.type
   ttl     = 60
   records = [each.value.record]
   allow_overwrite = true
 }
 
-# Assuming we have a valid ACM certificate, we validate it using the DNS records above. 
-# This resource will handle the validation process.
+# This resource will wait for the cert to complete.
 resource "aws_acm_certificate_validation" "skippymart_cert_validation" {
   provider = aws.us_east_1
   certificate_arn         = aws_acm_certificate.skippymart_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.skippymart_cert_validation : record.fqdn]
+
+  timeouts {
+    create = "2h"
+  }
 }
