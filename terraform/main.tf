@@ -15,15 +15,15 @@ resource "aws_s3_bucket_public_access_block" "skippymart" {
   restrict_public_buckets = true
 }
 
-# resource "aws_acm_certificate" "skippymart_cert" {
-#   domain_name       = "skippymart.com"
-#   validation_method = "DNS"
-#   subject_alternative_names = [ "www.skippymart.com" ]
+resource "aws_acm_certificate" "skippymart_cert" {
+  domain_name       = "skippymart.com"
+  validation_method = "DNS"
+  subject_alternative_names = [ "www.skippymart.com" ]
 
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
 # data "aws_route53_zone" "domain_zone" {
 #   name         = "skippymart.com"
