@@ -44,6 +44,7 @@ resource "aws_route53_record" "skippymart_cert_validation" {
   type    = each.value.type
   ttl     = 60
   records = [each.value.record]
+  allow_overwrite = true #  May already exist: [name='www.skippymart.com.', type='CNAME']
 }
 
 resource "aws_acm_certificate_validation" "skippymart_cert_validation" {
