@@ -50,4 +50,8 @@ resource "aws_route53_record" "skippymart_cert_validation" {
 resource "aws_acm_certificate_validation" "skippymart_cert_validation" {
   certificate_arn         = aws_acm_certificate.skippymart_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.skippymart_cert_validation : record.fqdn]
+
+  timeouts {
+    create = "2h" #  Terraform will poll for up to 2 hours to validate the certificate.
+  }
 }
