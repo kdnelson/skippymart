@@ -16,6 +16,7 @@ resource "aws_s3_bucket_public_access_block" "skippymart" {
 }
 
 resource "aws_acm_certificate" "skippymart_cert" {
+  provider          = aws.us_east_1
   domain_name       = "skippymart.com"
   validation_method = "DNS"
   subject_alternative_names = [ "www.skippymart.com" ]
