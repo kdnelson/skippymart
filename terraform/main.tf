@@ -25,7 +25,7 @@ resource "aws_acm_certificate" "skippymart_cert" {
   }
 }
 
-data "aws_route53_zone" "primary" {
+data "aws_route53_zone" "domain_zone" {
   name         = "skippymart.com"
   private_zone = false
 }
@@ -39,8 +39,8 @@ resource "aws_route53_record" "skippymart_cert_validation" {
     }
   }
 
-  zone_id = data.aws_route53_zone.primary.id
-  name    = "www.${data.aws_route53_zone.primary.name}"
+  zone_id = data.aws_route53_zone.domain_zone.id
+  name    = "www.${data.aws_route53_zone.domain_zone.name}"
   type    = each.value.type
   ttl     = 60
   records = [each.value.record]
