@@ -1,8 +1,5 @@
 resource "aws_s3_bucket" "skippymart" {
   bucket = var.bucket_name
-  tags = {
-    Name = var.bucket_name
-  }
 }
 
 resource "aws_s3_bucket_public_access_block" "skippymart" {
@@ -12,6 +9,30 @@ resource "aws_s3_bucket_public_access_block" "skippymart" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "skippymart_policy" {
+  bucket = aws_s3_bucket.skippymart.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowCloudFrontServicePrincipalReadOnly"
+        Effect    = "Allow"
+        Principal = {
+          Service = "://amazonaws.com"
+        }
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.skippymart.arn}/*"
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.skippymart_distribution.arn
+          }
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_route53_zone" "domain_zone" {
@@ -123,6 +144,8 @@ resource "aws_cloudfront_distribution" "skippymart_distribution" {
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
+
+  depends_on = [ aws_acm_certificate_validation.skippymart_cert_validation ]
 
   restrictions {
     geo_restriction {
