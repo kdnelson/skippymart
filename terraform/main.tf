@@ -1,8 +1,7 @@
 resource "aws_s3_bucket" "skippymart" {
   bucket = var.bucket_name
   tags = {
-    Name        = var.bucket_name
-    Environment = "Dev"
+    Name = var.bucket_name
   }
 }
 
@@ -13,6 +12,11 @@ resource "aws_s3_bucket_public_access_block" "skippymart" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_route53_zone" "domain_zone" {
+  name          = "skippymart.com"
+  force_destroy = false
 }
 
 resource "aws_acm_certificate" "skippymart_cert" {
@@ -26,10 +30,10 @@ resource "aws_acm_certificate" "skippymart_cert" {
   }
 }
 
-data "aws_route53_zone" "domain_zone" {
-  name         = "skippymart.com"
-  private_zone = false
-}
+# data "aws_route53_zone" "domain_zone" {
+#   name         = "skippymart.com"
+#   private_zone = false
+# }
 
 resource "aws_route53_record" "skippymart_cert_validation" {
   for_each = {
@@ -40,7 +44,7 @@ resource "aws_route53_record" "skippymart_cert_validation" {
     }
   }
 
-  zone_id = data.aws_route53_zone.domain_zone.id
+  zone_id = aws_route53_zone.domain_zone.zone_id
   name    = each.value.name
   type    = each.value.type
   ttl     = 60
@@ -55,6 +59,6 @@ resource "aws_acm_certificate_validation" "skippymart_cert_validation" {
   validation_record_fqdns = [for record in aws_route53_record.skippymart_cert_validation : record.fqdn]
 
   timeouts {
-    create = "2h"
+    create = "15m"
   }
 }
