@@ -10,7 +10,7 @@ permissions:
   contents: read
   
 jobs:
-  create_bucket:
+  deploy_skippymart:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

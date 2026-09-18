@@ -14,6 +14,8 @@ resource "aws_s3_bucket_public_access_block" "skippymart" {
 resource "aws_s3_bucket_policy" "skippymart_policy" {
   bucket = aws_s3_bucket.skippymart.id
 
+  depends_on = [aws_cloudfront_distribution.skippymart_distribution]
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
