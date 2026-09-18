@@ -15,13 +15,13 @@ resource "aws_s3_bucket_public_access_block" "skippymart" {
 }
 
 resource "aws_route53_zone" "domain_zone" {
-  name          = "skippymart.com"
+  name          = var.website_name
   force_destroy = false
 }
 
 resource "aws_acm_certificate" "skippymart_cert" {
   provider          = aws.us_east_1
-  domain_name       = "skippymart.com"
+  domain_name       = var.website_name
   validation_method = "DNS"
   subject_alternative_names = [ "www.skippymart.com" ]
 
@@ -61,4 +61,26 @@ resource "aws_acm_certificate_validation" "skippymart_cert_validation" {
   timeouts {
     create = "15m"
   }
+}
+
+resource "aws_route53_domains_registered_domain" "skippymart_domain" {
+  domain_name = var.website_name
+
+  name_server {
+    name = aws_route53_zone.domain_zone.name_servers[0]
+  }
+  name_server {
+    name = aws_route53_zone.domain_zone.name_servers[1]
+  }
+  name_server {
+    name = aws_route53_zone.domain_zone.name_servers[2]
+  }
+  name_server {
+    name = aws_route53_zone.domain_zone.name_servers[3]
+  }
+}
+
+import {
+  to = aws_route53_domains_registered_domain.skippymart_domain
+  id = var.website_name
 }

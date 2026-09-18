@@ -32,7 +32,7 @@ jobs:
           role-to-assume: ${{ secrets.IAM_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
           audience: ${{ secrets.AUDIENCE }}
-          role-duration-seconds: 14400
+          role-duration-seconds: 7200
 
       - name: Run aws sts get-caller-identity
         run: |
