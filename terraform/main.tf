@@ -11,30 +11,31 @@ resource "aws_s3_bucket_public_access_block" "skippymart" {
   restrict_public_buckets = true
 }
 
+data "aws_iam_policy_document" "skippymart_cloudfront_access" {
+  statement {
+    sid       = "AllowCloudFrontServicePrincipalReadOnly"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.skippymart.arn}/*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.skippymart_distribution.arn]
+    }
+  }
+}
+
 resource "aws_s3_bucket_policy" "skippymart_policy" {
   bucket = aws_s3_bucket.skippymart.id
+  policy     = data.aws_iam_policy_document.skippymart_cloudfront_access.json
 
   depends_on = [aws_cloudfront_distribution.skippymart_distribution]
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "AllowCloudFrontServicePrincipalReadOnly"
-        Effect    = "Allow"
-        Principal = {
-          Service = "://amazonaws.com"
-        }
-        Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.skippymart.arn}/*"
-        Condition = {
-          StringEquals = {
-            "AWS:SourceArn" = aws_cloudfront_distribution.skippymart_distribution.arn
-          }
-        }
-      }
-    ]
-  })
 }
 
 resource "aws_route53_zone" "domain_zone" {
