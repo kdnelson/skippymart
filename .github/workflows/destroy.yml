@@ -1,9 +1,6 @@
-name: deploy skippymart
+name: destroy skippymart
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -11,21 +8,11 @@ permissions:
   contents: read
   
 jobs:
-  deploy_skippymart:
+  destroy_skippymart:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-cache: 'npm'
-
-      - name: Install and Build Vite App
-        run: |
-          npm ci
-          npm run build
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -39,6 +26,11 @@ jobs:
         run: |
           aws sts get-caller-identity
 
+      - name: Force Empty S3 Bucket
+        run: |
+          aws s3 rm s3://${{ secrets.BUCKET_NAME }} --recursive --region us-west-2
+        continue-on-error: true
+
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -48,16 +40,12 @@ jobs:
         run: terraform init
         working-directory: terraform
 
-      - name: Terraform Plan
+      - name: Terraform Destroy Plan
         env:
           TF_VAR_bucket_name: ${{ secrets.BUCKET_NAME }}
-        run: terraform plan -lock=false -out=tfplan
+        run: terraform plan -destroy -lock=false -out=destroyplan
         working-directory: terraform
 
-      - name: Terraform Apply
-        run: terraform apply -lock=false -auto-approve tfplan
+      - name: Terraform Apply Destroy
+        run: terraform apply -lock=false -auto-approve destroyplan
         working-directory: terraform
-
-      - name: Sync dist to S3 Bucket
-        run: |
-          aws s3 sync ./dist s3://${{ secrets.BUCKET_NAME }} --delete --region us-west-2
