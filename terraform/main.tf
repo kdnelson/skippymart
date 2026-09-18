@@ -80,8 +80,8 @@ import {
   id = var.website_name
 }
 
-resource "aws_cloudfront_origin_access_control" "skippymart_oai" {
-  name = "${aws_s3_bucket.skippymart.bucket}-oai"
+resource "aws_cloudfront_origin_access_control" "skippymart_oac" {
+  name = "${aws_s3_bucket.skippymart.bucket}-oac"
   origin_access_control_origin_type = "s3"
   signing_behavior = "always"
   signing_protocol = "sigv4"
