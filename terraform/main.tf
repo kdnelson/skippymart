@@ -63,7 +63,7 @@ resource "aws_acm_certificate_validation" "skippymart_cert_validation" {
   }
 }
 
-resource "aws_route53_domains_registered_domain" "skippymart_domain" {
+resource "aws_route53domains_registered_domain" "skippymart_domain" {
   domain_name = var.website_name
 
   name_server {
@@ -81,6 +81,6 @@ resource "aws_route53_domains_registered_domain" "skippymart_domain" {
 }
 
 import {
-  to = aws_route53_domains_registered_domain.skippymart_domain
+  to = aws_route53domains_registered_domain.skippymart_domain
   id = var.website_name
 }
