@@ -29,8 +29,6 @@ jobs:
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
-        env:
-          AWS_STS_REGIONAL_ENDPOINTS: regional 
         with:
           role-to-assume: ${{ secrets.IAM_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
