@@ -35,10 +35,6 @@ jobs:
           aws-sts-regional-endpoints: regional
           role-duration-seconds: 7200
 
-      - name: Run aws sts get-caller-identity
-        run: |
-          aws sts get-caller-identity
-
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
